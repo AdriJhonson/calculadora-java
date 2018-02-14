@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 import javax.swing.JButton;
 import br.com.adrisilva.calculadora.classes.Operations;
 
-
 /**
  *
  * @author Familía
@@ -20,9 +19,17 @@ public class ViewCalculator extends javax.swing.JFrame {
      * Creates new form ViewCalculator
      */
     private boolean fimDoCalculo = false;
+    public int teclasNumpad[] = new int[106];
+    public int valor = 0;
 
     public ViewCalculator() {
         initComponents();
+
+        //Laço que vai "popular" o array com os números do NUMPAD
+        for (int i = 0; i <= 105; i++) {
+            teclasNumpad[i] = valor;
+            valor++;
+        }
     }
 
     /**
@@ -169,7 +176,7 @@ public class ViewCalculator extends javax.swing.JFrame {
         });
 
         btnAddComma.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
-        btnAddComma.setText(",");
+        btnAddComma.setText(".");
         btnAddComma.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAddCommaActionPerformed(evt);
@@ -392,11 +399,13 @@ public class ViewCalculator extends javax.swing.JFrame {
 
     private void btnCalculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalculateActionPerformed
         showResult();
+        txtResult.grabFocus();
         fimDoCalculo = true;
     }//GEN-LAST:event_btnCalculateActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         clearResult();
+        txtResult.grabFocus();
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void jPanel1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jPanel1KeyPressed
@@ -405,9 +414,44 @@ public class ViewCalculator extends javax.swing.JFrame {
 
     private void txtResultKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtResultKeyPressed
         System.out.println(evt.getKeyCode());
-        if(evt.getKeyCode() == 96){
-            adicionarValorTeclado("0");
+
+        for (int i = 96; i <= 105; i++) {
+            if (evt.getKeyCode() == i) {
+                adicionarValorTeclado("" + evt.getKeyChar());
+            }
         }
+        
+        for (int i = 48; i <= 57; i++) {
+            if (evt.getKeyCode() == i) {
+                adicionarValorTeclado("" + evt.getKeyChar());
+            }
+        }
+        
+        switch (evt.getKeyCode()) {
+            case 0:
+                adicionarValorTeclado(".");
+                break;
+            case 111:
+                adicionarValorTeclado("/");
+                break;
+            case 106:
+                adicionarValorTeclado("*");
+                break;
+            case 109:
+                adicionarValorTeclado("-");
+                break;
+            case 107:
+                adicionarValorTeclado("+");
+                break;
+            //Realizar o cálculo quando o ENTER for precionado
+            case 10: 
+                showResult();
+                fimDoCalculo = true;
+                break;
+            default:
+                break;
+        }
+        
     }//GEN-LAST:event_txtResultKeyPressed
 
     /**
@@ -482,16 +526,22 @@ public class ViewCalculator extends javax.swing.JFrame {
         String valor = button.getText();
         String novoValor = valorAnterior + "" + valor;
         txtResult.setText(novoValor);
+        txtResult.grabFocus();
     }
-    
+
     //Método que vai adicionar o valor digitado no Result
-    private void adicionarValorTeclado(String valor){
+    private void adicionarValorTeclado(String valor) {
+        if (fimDoCalculo) {
+            clearResult();
+            fimDoCalculo = false;
+        }
+
         String valorAnterior = txtResult.getText();
 
         if (valorAnterior.equals("0")) {
             txtResult.setText("");
         }
-        
+
         valorAnterior = txtResult.getText();
 
         String novoValor = valorAnterior + "" + valor;
@@ -557,6 +607,5 @@ public class ViewCalculator extends javax.swing.JFrame {
         clearResult();
         txtResult.setText("" + finalResult);
     }
-
 
 }
